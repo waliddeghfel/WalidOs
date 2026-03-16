@@ -2,21 +2,6 @@
 <html lang="en" dir="ltr">
 <head>
     <meta charset="UTF-8">
-    
-    <!-- ═══════════════════════════════════════════════════
-         PWA — Progressive Web App manifest & meta
-         ═══════════════════════════════════════════════════ -->
-    <link rel="manifest" href="manifest.json">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="WALID OS">
-    <meta name="application-name" content="WALID OS">
-    <meta name="msapplication-TileColor" content="#080A0E">
-    <meta name="theme-color" content="#080A0E">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>WALID OS v15 — Onyx Edition</title>
 
@@ -2702,7 +2687,7 @@ body, html {
 /* ============================================================
    WALID OS - CORE WINDOW MANAGER
    ============================================================ */
-window.addEventListener('load', () => {
+window.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         const boot = document.getElementById('boot-screen');
         boot.style.opacity = '0';
@@ -6307,109 +6292,6 @@ function smExportPDFReport() {
     setTimeout(() => URL.revokeObjectURL(url), 2000);
   }
 <\/script>
-
-<!-- ═══════════════════════════════════════════════════
-     PWA — Service Worker Registration
-     ═══════════════════════════════════════════════════ -->
-<script>
-(function() {
-  if (!('serviceWorker' in navigator)) return;
-
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js', { scope: './' })
-      .then(reg => {
-        console.log('[WALID OS PWA] Service Worker registered:', reg.scope);
-
-        // Notify if update is available
-        reg.addEventListener('updatefound', () => {
-          const newWorker = reg.installing;
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              showPwaUpdateBanner();
-            }
-          });
-        });
-      })
-      .catch(err => console.warn('[WALID OS PWA] SW registration failed:', err));
-  });
-
-  // ── Install prompt (Add to Home Screen) ────────────────
-  let deferredPrompt = null;
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    showInstallButton();
-  });
-
-  window.addEventListener('appinstalled', () => {
-    deferredPrompt = null;
-    hideInstallButton();
-    console.log('[WALID OS PWA] App installed successfully');
-  });
-
-  window.pwaInstall = function() {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(r => {
-      deferredPrompt = null;
-      hideInstallButton();
-    });
-  };
-
-  function showInstallButton() {
-    let btn = document.getElementById('pwa-install-btn');
-    if (!btn) {
-      btn = document.createElement('div');
-      btn.id = 'pwa-install-btn';
-      btn.title = 'Install WALID OS';
-      btn.onclick = window.pwaInstall;
-      btn.innerHTML = `
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-          <path d="M12 2v13M7 11l5 5 5-5"/><rect x="3" y="18" width="18" height="3" rx="1"/>
-        </svg>
-        Install`;
-      btn.style.cssText = `
-        position:fixed; bottom:48px; right:12px; z-index:99999;
-        background:rgba(0,200,255,0.12); border:1px solid #00C8FF;
-        color:#00C8FF; padding:7px 13px; border-radius:8px;
-        font-family:'IBM Plex Sans',sans-serif; font-size:12px;
-        display:flex; align-items:center; gap:6px; cursor:pointer;
-        backdrop-filter:blur(12px); transition:all .2s;
-        box-shadow:0 0 14px rgba(0,200,255,0.2);`;
-      btn.onmouseenter = () => btn.style.background = 'rgba(0,200,255,0.22)';
-      btn.onmouseleave = () => btn.style.background = 'rgba(0,200,255,0.12)';
-      document.body.appendChild(btn);
-    }
-    btn.style.display = 'flex';
-  }
-
-  function hideInstallButton() {
-    const btn = document.getElementById('pwa-install-btn');
-    if (btn) btn.style.display = 'none';
-  }
-
-  function showPwaUpdateBanner() {
-    const banner = document.createElement('div');
-    banner.style.cssText = `
-      position:fixed; top:10px; left:50%; transform:translateX(-50%);
-      z-index:99999; background:rgba(8,10,14,0.92); border:1px solid #00C8FF;
-      color:#fff; padding:10px 18px; border-radius:10px;
-      font-family:'IBM Plex Sans',sans-serif; font-size:13px;
-      display:flex; align-items:center; gap:12px;
-      backdrop-filter:blur(16px); box-shadow:0 4px 24px rgba(0,200,255,0.18);`;
-    banner.innerHTML = `
-      <span style="color:#00C8FF">⬆ Update available</span>
-      <button onclick="navigator.serviceWorker.controller.postMessage('skipWaiting');location.reload();"
-        style="background:#00C8FF;color:#080A0E;border:none;border-radius:5px;
-               padding:4px 12px;cursor:pointer;font-weight:600;font-size:12px;">
-        Reload
-      </button>
-      <span onclick="this.parentElement.remove()" style="cursor:pointer;opacity:.5;padding:0 4px">✕</span>`;
-    document.body.appendChild(banner);
-  }
-})();
-</script>
-
 </body>
 </html>`;
 
